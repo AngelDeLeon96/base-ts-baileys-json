@@ -1,0 +1,130 @@
+[
+  {
+    "ref": "78499fbb-b763-4fef-8b93-cbf3eec2d4ab",
+    "keyword": "fe27f13672387c365fdf21e5d482ed8b",
+    "answer": "hola",
+    "options": {},
+    "from": "50766962147",
+    "refSerialize": "79e7fc16f7fb85373fd25a99390f44c0"
+  },
+  {
+    "ref": "ans_bb5fcf9f-2873-4a7a-b66b-ed5e14330b7b",
+    "keyword": "key_b3e91661-4423-4698-a1fd-9f3569e9ba9a",
+    "answer": "Hola 😊",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 0,
+      "nested": [],
+      "keyword": {},
+      "callback": false
+    },
+    "refSerialize": "de8afd7898f72e27841fb53f220eca61",
+    "from": "50766962147"
+  },
+  {
+    "ref": "ans_594927ed-94b5-4138-bf54-89564fbad0dd",
+    "keyword": "ans_bb5fcf9f-2873-4a7a-b66b-ed5e14330b7b",
+    "answer": "Soy V un Agente IA 🤖",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 100,
+      "nested": [],
+      "keyword": {},
+      "callback": false
+    },
+    "refSerialize": "83e4c8a7b2bce13d1ead59343df8452a",
+    "from": "50766962147"
+  },
+  {
+    "ref": "ans_58c90725-0bcd-48a9-91cc-ab87ffee67ec",
+    "keyword": "ans_594927ed-94b5-4138-bf54-89564fbad0dd",
+    "answer": "__capture_only_intended__",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 100,
+      "nested": [],
+      "keyword": {},
+      "callback": true
+    },
+    "refSerialize": "8331123402a812904617f412fb77a9f6",
+    "from": "50766962147"
+  },
+  {
+    "ref": "ans_d2246e48-1311-49c6-8a58-3c24ce77d453",
+    "keyword": "ans_58c90725-0bcd-48a9-91cc-ab87ffee67ec",
+    "answer": "En que puedo ayudarte, el dia de hoy?",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 100,
+      "nested": [],
+      "keyword": {},
+      "callback": false
+    },
+    "refSerialize": "653a1bb295be85ffd3c145b9ff294151",
+    "from": "50766962147"
+  },
+  {
+    "ref": "ans_07853716-a591-4b55-9060-93e4af171ddc",
+    "keyword": "ans_d2246e48-1311-49c6-8a58-3c24ce77d453",
+    "answer": "__capture_only_intended__",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 100,
+      "nested": [],
+      "keyword": {},
+      "callback": true
+    },
+    "refSerialize": "996cdeea01d830e5b6ca27da96b1310b",
+    "from": "50766962147"
+  },
+  {
+    "ref": "ans_d82fa3c9-e975-4d35-aae2-344187997e81",
+    "keyword": "ans_07853716-a591-4b55-9060-93e4af171ddc",
+    "answer": "__call_action__",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 0,
+      "nested": [],
+      "keyword": {},
+      "callback": true
+    },
+    "refSerialize": "60a0a17d2fdf299fa7fe50ce1f5758c8",
+    "from": "50766962147"
+  },
+  {
+    "ref": "ans_6de2574d-ed95-4505-8e38-ecda761c8710",
+    "keyword": "key_5a5cf327-ceb1-43e8-b846-0919b833e2b9",
+    "answer": "__call_action__",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 0,
+      "nested": [],
+      "keyword": {},
+      "callback": true
+    },
+    "refSerialize": "9da63145de3f58f741cb28256e038c2b",
+    "from": "50766962147"
+  },
+  {
+    "ref": "ans_5116766b-f7f5-4c56-9375-55afae12698e",
+    "keyword": "ans_6de2574d-ed95-4505-8e38-ecda761c8710",
+    "answer": "__call_action__",
+    "options": {
+      "buttons": [],
+      "capture": false,
+      "delay": 0,
+      "nested": [],
+      "keyword": {},
+      "callback": true
+    },
+    "refSerialize": "22c390f38308a126444a378c679dd2c1",
+    "from": "50766962147"
+  }
+]
