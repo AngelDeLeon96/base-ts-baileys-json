@@ -17,6 +17,7 @@ class EnvLoader {
                 DEBOUNCE_TIME: process.env.DEBOUNCE_TIME
             }
         }
+        //console.log(this.envCache)
         return this.envCache
     }
 

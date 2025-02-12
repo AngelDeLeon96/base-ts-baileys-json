@@ -3,7 +3,10 @@ import { Ollama } from "@langchain/ollama";
 import { PromptTemplate } from "@langchain/core/prompts";
 import { ProviderClass } from '@builderbot/bot';
 import { BotContext } from '@builderbot/bot/dist/types';
+import EnvLoader from './config';
+import * as http from 'http'
 
+const env = EnvLoader.load()
 // Variable para manejar mensajes de progreso
 let progressInterval: NodeJS.Timeout;
 let progressMessageIndex = 0;
@@ -14,69 +17,28 @@ const progressMessages = [
 ];
 
 const llm = new Ollama({
-    model: "phi4", // Default value
+    model: env.MODEL, // Default value
     temperature: 0,
     maxRetries: 2,
     // other params...
 });
 
-const promptGenerator = (history: Array<{ role: string, content: string }>) => {
-    const formattedHistory = history.map(item => `${item.role}: ${item.content}`).join('\n');
+interface ApiResponse {
+    data: any;
+    statusCode: number;
+}
 
-    return `
-Como una inteligencia artificial avanzada, tu tarea es analizar el contexto de una conversación y determinar cuál de las siguientes acciones es más apropiada para realizar:
---------------------------------------------------------
-Historial de conversación:
-${formattedHistory}
-
-Posibles acciones a realizar:
-1. nombre del producto: Esta función se debe realizar cuando el cliente solicita el precio de un producto. **Si eliges esta acción, debes responder con SOLO el nombre específico del producto mencionado por el usuario (ejemplo: "leche", "manteca") sin ninguna palabra adicional.**
-2. REPETIR: Esta acción se debe realizar cuando la inteligencia artificial no puede determinar otra opción a realizar y cae en esta por defecto, es el equivalente al caso fallback.
-3. SUPERMERCADO: Esta función se debe realizar cuando el cliente solicita información sobre donde se obtienen los precios.
-4. HOLA: Esta función se debe realizar cuando el cliente saluda. IMPORTANTE: no utilizar si el cliente dice algo como "hola quiero saber el precio de este producto X", en ese caso ir por PRODUCTO.
-5. ADIOS: Esta función se debe realizar cuando el cliente se despide.
-6. AYUDA: Esta función se debe realizar cuando el cliente solicita ayuda o alguna frase que incluya la palabra ayuda o su significado.
-7. CREADOR: Esta función se debe realizar cuando el cliente solicite información sobre la persona que creó el bot.
-
-Respuesta ideal: si el usuario menciona un producto, responde solo con el nombre del producto. Si no hay un producto claro, responde con una de estas opciones (REPETIR|SUPERMERCADO|HOLA|ADIOS|AYUDA|CREADOR).
-Si el cliente da una respuesta que no es producto pero no sabes que es, responde con 'REPETIR'.
-`;
-};
-
-const ollamaIA = async (prompt: string) => {
-    try {
-        console.log("enviando a ollama:", prompt);
-        // Incluimos el prompt como un mensaje del sistema (opcional)
-        const messages = [
-            { role: "system", content: prompt }
-        ];
-
-        const response = await ollama.chat({
-            model: 'phi4',
-            // model: 'llama3.1',
-            // model: 'codeqwen',
-            // model: 'phi3', 
-
-            messages: messages
-        });
-
-        // Retorna solo el contenido de la respuesta del asistente
-        return response.message.content;
-
-    } catch (error) {
-        console.error('Error al obtener respuesta de la IA:', error);
-        return "ERROR";
-    }
-};
 const ollama2 = async (payload: BotContext, adapter: ProviderClass) => {
     try {
         // Inicia un temporizador para enviar mensajes periódicos
+        adapter.vendor.sendMessage(payload.key.remoteJid, { text: "🔴Estoy procesando tu solicitud, por favor espera." }, {});
+
         progressInterval = setInterval(() => {
             console.log(progressMessages[progressMessageIndex]);
-            adapter.sendMessage(payload.from, { text: progressMessages[progressMessageIndex] }, {});
+            adapter.vendor.sendMessage(payload.key.remoteJid, { text: progressMessages[progressMessageIndex] }, {});
 
             progressMessageIndex = (progressMessageIndex + 1) % progressMessages.length;
-        }, 10000); // Cada 10 segundos.
+        }, 100000); // Cada 10 segundos.
 
         const prompt = PromptTemplate.fromTemplate(
             "Analiza la pregunta del usuario {input} y responde en {output_language}:\n"
@@ -88,8 +50,9 @@ const ollama2 = async (payload: BotContext, adapter: ProviderClass) => {
             input: payload.body,
         })
         clearInterval(progressInterval);
+        const res_cleared = responseClear(res)
 
-        return res
+        return res_cleared
     }
     catch (error) {
         clearInterval(progressInterval);
@@ -100,5 +63,49 @@ const ollama2 = async (payload: BotContext, adapter: ProviderClass) => {
     }
 }
 
+const ollamaAPI = async (data: BotContext, adapter: ProviderClass) => {
+    if (!data) {
+        throw new Error('Se requiere una pregunta válida.');
+    }
+    adapter.vendor.sendMessage(data.key.remoteJid, { text: "🔴Estoy procesando tu solicitud, por favor espera." }, {});
+    console.log(data)
 
-export { ollama2 };
+    const apiUrl = 'http://localhost:11434/api/chat';
+    const res = JSON.stringify({
+        model: env.MODEL,
+        messages: [
+            { role: 'user', content: data.body }
+        ],
+        stream: false,
+        options: {
+            "temperature": 0
+        }
+    });
+
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: res
+    };
+
+    const dataRaw = await fetch(apiUrl, options);
+    const response = await dataRaw.json();
+    console.log(">==", response)
+    const res_cleared = responseClear(response?.message?.content)
+    return res_cleared
+}
+
+const responseClear = (response: string) => {
+
+    // Eliminar contenido entre <explicación> y </explicación>
+    const respuestaLimpia: string = response.replace(/<think>[\s\S]*?<\/think>/g, '');
+    console.log("cleared: ", respuestaLimpia)
+    // Eliminar espacios en blanco adicionales
+    const respuestaFinal: string = respuestaLimpia.trim();
+
+    return respuestaFinal
+}
+
+export { ollama2, ollamaAPI };

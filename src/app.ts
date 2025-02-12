@@ -2,7 +2,7 @@ import path, { join } from 'path'
 import { createBot, createProvider, createFlow, addKeyword, utils, EVENTS } from '@builderbot/bot'
 import { JsonFileDB as Database } from '@builderbot/database-json'
 import { BaileysProvider as Provider } from '@builderbot/provider-baileys'
-import { ollama2 } from './utils/ollama'
+import { ollama2, ollamaAPI } from './utils/ollama'
 import { startBot } from './utils/timer'
 import { debounce } from './utils/debounce'
 import Queue from 'queue-promise'
@@ -22,11 +22,11 @@ const freeFlow = addKeyword(EVENTS.ACTION)
     .addAction(async (ctx, { blacklist }) => {
         const number = ctx.from.replace("+", "")
         const check_num = blacklist.checkIf(number)
-        console.log("Check number", check_num)
+        //console.log("Check number", check_num)
 
         if (!check_num) {
             blacklist.add(number)
-            console.log(`Number: ${number} is added to blacklist and Bot will not respond to this number`)
+            //console.log(`Number: ${number} is added to blacklist and Bot will not respond to this number`)
             return
         }
 
@@ -35,7 +35,7 @@ const freeFlow = addKeyword(EVENTS.ACTION)
 
 const welcomeFlow = addKeyword(EVENTS.WELCOME)
     .addAnswer('Hola 😊')
-    .addAnswer("Soy V un Agente IA 🤖", { delay: 100 })
+    .addAnswer(`Soy "TARS" un Agente IA 🤖`, { delay: 100 })
     .addAnswer("En que puedo ayudarte, el dia de hoy?", { delay: 100 })
     .addAction(async (_, { gotoFlow }) => {
         return gotoFlow(freeFlow)
@@ -61,13 +61,13 @@ const main = async () => {
         try {
             //const debounceOllama = debounce(ollamaIA, 500);
             if (bot.dynamicBlacklist.checkIf(payload.from)) {
-                console.log(`User ${payload.from} is in blacklist and Bot will not respond to this number`)
-                console.log(`Message: ${JSON.stringify(payload.body)}`)
                 queue.enqueue(async () => {
-                    const response = await ollama2(payload, adapterProvider)
+                    const response = await ollamaAPI(payload, adapterProvider)
 
-                    sendResponse(payload.key.remoteJid, response)
-
+                    if (response) {
+                        const respuesta = response
+                        sendResponse(payload.key.remoteJid, respuesta)
+                    }
                 });
                 return
 
@@ -78,7 +78,7 @@ const main = async () => {
     })
 
     bot.on('send_message', ({ answer, from }) => {
-        console.log(`Bot Send Message Payload:`, { answer, from })
+        //console.log(`Bot Send Message Payload:`, { answer, from })
     })
 
     function sendResponse(phone: string, response: string) {
